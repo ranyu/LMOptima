@@ -4,7 +4,7 @@
 def load_dic():
     fea_dic = {}
     fea_index = {}
-    with open('../word2vec/weiboseg_nb.bin','r') as f:
+    with open('../../word2vec/weiboseg_nb.bin','r') as f:
         f.readline()
         for i,data in enumerate(f):
             con = data.strip().split()
@@ -13,37 +13,31 @@ def load_dic():
     return fea_dic,fea_index
 
 def load_feature(fea_dic,fea_index):
-    #fw = open('feature.r','w')
+    fw = open('feature.r','w')
     fws = open('label.r','w')
-    fws.write('!!!!')
-    with open('../../data/segment/weibo_seg_clean','r') as f:
+    with open('../../../data/segment/weibo_seg_clean','r') as f:
         for j,data in enumerate(f):
             con = data.strip().split()
             for i,ele in enumerate(con):
-                '''if ele not in fea_dic.keys():
+                if ele not in fea_dic.keys():
                     for sl in fea_dic['</s>']:
                         fw.write(sl+' ')
                     fw.write('\n')
                 else:
                     for sl in fea_dic[ele]:
                         fw.write(sl+' ')
-                    fw.write('\n')'''
+                    fw.write('\n')
                 if i != len(con)-1:
                     next = con[i+1]
                     print 'fff',next
                     if next not in fea_dic.keys():
-                        print('!!!'+str(fea_index['</s>'])+'\n')
-                        #fw2.write('!!!'+str(fea_index['</s>'])+'\n')
-                        fws.write('!!!'+'\n')
+                        fws.write(str(fea_index['</s>'])+'\n')
                     else:
-                        print('???'+str(fea_index[next])+'\n')
-                        fws.write('???'+str(fea_index[next])+'\n')
+                        fws.write(str(fea_index[next])+'\n')
                 else:
-                    print('~~~'+str(fea_index['</s>'])+'\n')
-                    fws.write('~~~'+str(fea_index['</s>'])+'\n')
-                #raw_input()
+                    fws.write(str(fea_index['</s>'])+'\n')
             print j
-    #fw.close()
+    fw.close()
     fws.close()
 
 def main():
