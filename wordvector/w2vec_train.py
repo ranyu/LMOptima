@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
 from gensim.models import Word2Vec,Phrases
 import numpy as np
-    
-def get_result(model):
-    questions_path = "preprocess_ques.txt"
-    questions = open(questions_path)
+   
+def get_result():
     sentences = []
-    for line in questions:
-        sentences.append(line.strip().split()[:])
-    different_word_index = np.zeros((1040), dtype = np.int)
-    for question_number in xrange(1040):
-        sen_0 = sentences[5*question_number]
-        sen_1 = sentences[5*question_number+1]
-        sentence_length = len(sen_0)
-        for i in xrange(sentence_length):
-            if sen_0[i]!=sen_1[i]:
-                different_word_index[question_number] = i
-                break
+    with open('../../LMOptima/rnnlm-0.4b/result/sys_result','r') as f:
+        for data in f:
+            sentences.append(data.strip().decode('gb18030').encode('utf-8'))
+    score = 0
+    scores = []
+    for param_1 in [-1.]:
+        for param_2 in [5]:
+            for p in sentences:
+                words = p.split()
+                for q in words[0:-1]:
+                    print q
+                    score += pow(model.vocab[q].count,param_1)*(model.similarity(q,words[-1])+2**param_2)
+                scores.append(score)
+            score = 0
+            print sentences[np.argmax(scores)]
+
+'''def get_result(model):
     best_result = 0
     best_param_1 = 0
     best_param_2 = 0
-    best_scores = np.zeros((1040,5))
-    index = (0,0)
     max_re = 0
     max_scores = 0
     for param_1 in [-1.]:
@@ -44,11 +46,11 @@ def get_result(model):
                 fw.write('Id,Answer\n')
                 for i in xrange(1040):
                     fw.write(str(i+1)+','+str(letter[scores_amax[i]]+'\n'))
-
+'''
 def main():
-    model = Word2Vec.load_word2vec_format('word_vec.bin',binary = True)
+    model = Word2Vec.load_word2vec_format('../../word2vec/weiboseg.bin',binary = True)
     print 'load'
-    get_result(model) 
+    get_result() 
     print 'finish'
 
 if __name__ == "__main__":
