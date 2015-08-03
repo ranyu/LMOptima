@@ -1,57 +1,74 @@
 # -*- coding: utf-8 -*-
-from gensim.models import Word2Vec,Phrases
 import numpy as np
-   
-def get_result():
+import heapq
+from scipy.spatial.distance import cosine
+
+class w2vec:
+    def __init__(self):
+        self.vocab = {}
+        self.vector = {}
+        with open('../../word2vec/words','r') as f:
+            for data in f:
+                con = data.strip().split()
+                self.vocab.setdefault(con[0],int(con[1])) 
+        with open('./mobile-dbg.bin','r') as f:
+            f.readline()
+            f.readline()
+            f.readline()
+            for data in f:
+                con = data.strip().split()
+                self.vector.setdefault(con[0],[]) 
+                for q in con[1:]:
+                    self.vector[con[0]].append(float(q)) 
+
+    def __contains__(self,word):
+        return (word in self.vocab.keys())
+
+    def similarity(self,w1,w2):
+        a1 = np.array(w1)
+        a2 = np.array(w2)
+        print a1,a2
+        return cosine(a1,a2)
+    
+def get_result(model):
     sentences = []
-    with open('../../LMOptima/rnnlm-0.4b/result/sys_result','r') as f:
+    #with open('../../LMOptima/rnnlm-0.4b/result/sys_result','r') as f:
+    with open('./result','r') as f:
         for data in f:
-            sentences.append(data.strip().decode('gb18030').encode('utf-8'))
+            sentences.append(data.strip())#.decode('gb18030').encode('utf-8'))
+            #sentences.append(data.strip())
     score = 0
     scores = []
-    for param_1 in [-1.]:
-        for param_2 in [5]:
+    for param_1 in [-1.,-2.,-3.,0,1,2,3,4]:
+        for param_2 in [-1.,-2.,-3.,0,1,2,3,4]:
             for p in sentences:
                 words = p.split()
-                for q in words[0:-1]:
+                for q in words:
                     print q
-                    score += pow(model.vocab[q].count,param_1)*(model.similarity(q,words[-1])+2**param_2)
+                #print words.decode('gb18030').encode('utf-8')
+                for q in words[0:-1]:
+                    print q,model.__contains__(q)
+                    print np.array(model.vector[q])
+                    if model.__contains__(q):
+                        print words[-1]
+                        if model.__contains__(words[-1]):
+                            score += pow(model.vocab[q],param_1)*((model.similarity(model.vector[q],model.vector[words[-1]])+2)**param_2)
+                        print (score)
+                        raw_input()
                 scores.append(score)
+            for sq in heapq.nlargest(10,range(len(scores)),scores.__getitem__):
+                print (sentences[sq],scores[sq])
+                for ql in sentences[sq]:
+                    print ql
+            scores = []
             score = 0
-            print sentences[np.argmax(scores)]
+            raw_input()
 
-'''def get_result(model):
-    best_result = 0
-    best_param_1 = 0
-    best_param_2 = 0
-    max_re = 0
-    max_scores = 0
-    for param_1 in [-1.]:
-        for param_2 in [5]:
-            #print param_1,param_2
-            scores = np.zeros((1040,5))
-            for question_number in xrange(1040):
-                sen_0 = sentences[5*question_number]
-                sentence_length = len(sen_0)
-                for i in xrange(5):
-                    different_word = sentences[5*question_number+i][different_word_index[question_number]]
-                    if model.__contains__(different_word):
-                        for j in xrange(sentence_length):
-                            if j != different_word_index[question_number] and model.__contains__(sen_0[j]):
-                                scores[question_number,i] += pow(model.vocab[sen_0[j]].count,param_1)*((model.similarity(different_word,sen_0[j])+2)**param_2)
-            scores_amax = np.argmax(scores,1)
-            letter = ['a','b','c','d','e']
-            filename = 'submit.csv'
-            with open(filename,'w') as fw:
-                fw.write('Id,Answer\n')
-                for i in xrange(1040):
-                    fw.write(str(i+1)+','+str(letter[scores_amax[i]]+'\n'))
-'''
 def main():
-    model = Word2Vec.load_word2vec_format('../../word2vec/weiboseg.bin',binary = True)
-    print 'load'
-    get_result() 
-    print 'finish'
+    model = w2vec()
+    print ('load')
+    get_result(model) 
+    print ('finish')
 
 if __name__ == "__main__":
     main()
