@@ -10,7 +10,7 @@ class w2vec:
             for data in f:
                 con = data.strip().split()
                 self.vocab.setdefault(con[0],int(con[1])) 
-        with open('./mobile-dbg.bin','r') as f:
+        with open('./modify_cbow.bin','r') as f:
             f.readline()
             f.readline()
             f.readline()
@@ -47,13 +47,17 @@ def get_result(model,sys_dic):
             print param_1,param_2
             for i,p in enumerate(sentences):
                 words = p.split()
+                print words
                 for q in words[0:-1]:
                     print i
-                    if i > 1000:
+                    if i > 100:
                         break
-                    if model.__contains__(q) and model.__contains__(words[-1]):
+                    print q,words[-1]
+                    q = q.decode('utf-8').encode('gb18030')
+                    if model.__contains__(q) and model.__contains__(words[-1].decode('utf-8').encode('gb18030')):
+                        print '??'
                         a1 = np.array(model.vector[q])
-                        a2 = np.array(model.vector[words[-1]])
+                        a2 = np.array(model.vector[words[-1].decode('utf-8').encode('gb18030')])
                         score += pow(model.vocab[q],param_1)*((np.inner(a1,a2)+2)**param_2)
                         #score += model.similarity(a1,a2)
                 scores.append(score)
@@ -65,6 +69,10 @@ def get_result(model,sys_dic):
             scores = []
             raw_input()
 def gene_text(goal,fea_index):
+    sentences = []
+    for w in fea_index:
+        sentences.append(goal+' '+'\n')
+    #return sentences
     with open('result/sys_result','w') as f:
         for w in fea_index:
             f.write(goal+' '+w+'\n')
@@ -82,3 +90,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
