@@ -22,10 +22,7 @@ class w2vec:
 
     def __contains__(self,word):
         return word in self.vocab
-    '''def similarity(self,w1,w2):
-        a1 = np.array(w1)
-        a2 = np.array(w2)
-        return np.dot(a1,a2)'''
+
 def load_dic():
     dic = []
     with open('../core_table/asso_unigram.dic') as f:
@@ -36,44 +33,30 @@ def load_dic():
         return dic
 
 def get_result(model,sys_dic,sentences):
-    #sentences = []
-    '''with open('result/sys_result','r') as f:
-        for data in f:
-            sentences.append(data.strip())#.decode('gb18030').encode('utf-8'))
-            #sentences.append(data.strip())'''
     score = 0
     scores = []
-    for param_1 in [-1.]:#[-1.,-2.,-3.,0,1,2,3,4]:
-        for param_2 in [-1.]:#[-1.,-2.,-3.,0,1,2,3,4]:
+    for param_1 in [-1.,-2.,1.,2.]:
+        for param_2 in [-1.,-2.,1.,2.]:
             print param_1,param_2
             for i,p in enumerate(sentences):
                 words = p.split()
-                print i
-                '''if i > 1000:
-                    break'''
                 for q in words[0:-1]:
                     #print q,words[-1]
-                    if model.__contains__(q) and model.__contains__(words[-1]):
+                    if model.__contains__(q) and model.__contains__(words[-1]): #and q in sys_dic and words[-1] in sys_dic:
                         score += c1.inner_product(model.vector[q],model.vector[words[-1]],model.vocab[q],param_1,param_2)
-                        #score += pow(model.vocab[q],param_1) *((model.similarity(model.vector[q],model.vector[words[-1]])**param_2))
                 scores.append(score)
                 score = 0
             print 'calculation finish'
-            #print scores
             for sq in heapq.nlargest(50,range(len(scores)),scores.__getitem__):
                 print sentences[sq]
-                print scores[sq]
+                #print scores[sq]
             scores = []
-            raw_input()
+            #raw_input()
 def gene_text(goal,fea_index):
     sentences = []
     for w in fea_index:
         sentences.append(goal+' '+w+'\n')
     return sentences
-    '''with open('result/sys_result','w') as f:
-        for w in fea_index:
-            f.write(goal+' '+w+'\n')'''
-
 
 def main():
     model = w2vec()
