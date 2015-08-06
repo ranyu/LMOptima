@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import heapq
+import c1
 
 class w2vec:
     def __init__(self):
@@ -17,16 +18,11 @@ class w2vec:
             for data in f:
                 con = data.strip().split()
                 self.vector.setdefault(con[0],[]) 
-                for q in con[1:]:
-                    self.vector[con[0]].append(float(q)) 
+                self.vector[con[0]] = np.array(con[1:],dtype=np.float)
 
     def __contains__(self,word):
         return (word in self.vocab.keys())
 
-    def similarity(self,a1,a2):
-        print a1,len(a1)
-        #quit()
-        return np.inner(a1,a2)
 def load_dic():
     dic = []
     with open('../core_table/asso_unigram.dic') as f:
@@ -51,18 +47,19 @@ def get_result(model,sys_dic,sentences):
                 words = p.split()
                 for q in words[0:-1]:
                     print i
-                    '''if i > 1000:
-                        break'''
+                    #if i > 100:
+                        #break
                     #print q,words[-1]
                     if model.__contains__(q) and model.__contains__(words[-1]):
                         #print '??'
-                        a1 = np.array(model.vector[q])
-                        a2 = np.array(model.vector[words[-1]])
-                        score += pow(model.vocab[q],param_1)*((model.similarity(a1,a2)+2)**param_2)
-                        #score += model.similarity(a1,a2)
+                        #a1 = np.array(model.vector[q])
+                        #a2 = np.array(model.vector[words[-1]])
+                        score += c1.inner_product(model.vector[q],model.vector[words[-1]],model.vocab[q],param_1,param_2)
+                        #print score
                 scores.append(score)
                 score = 0
             print 'calculation finish'
+            #print scores
             for sq in heapq.nlargest(50,range(len(scores)),scores.__getitem__):
                 print sentences[sq]
                 print scores[sq]
