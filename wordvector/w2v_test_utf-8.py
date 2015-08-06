@@ -21,8 +21,11 @@ class w2vec:
                 self.vector[con[0]] = np.array(con[1:],dtype=np.float)
 
     def __contains__(self,word):
-        return (word in self.vocab.keys())
-
+        return word in self.vocab
+    '''def similarity(self,w1,w2):
+        a1 = np.array(w1)
+        a2 = np.array(w2)
+        return np.dot(a1,a2)'''
 def load_dic():
     dic = []
     with open('../core_table/asso_unigram.dic') as f:
@@ -45,17 +48,14 @@ def get_result(model,sys_dic,sentences):
             print param_1,param_2
             for i,p in enumerate(sentences):
                 words = p.split()
+                print i
+                '''if i > 1000:
+                    break'''
                 for q in words[0:-1]:
-                    print i
-                    #if i > 100:
-                        #break
                     #print q,words[-1]
                     if model.__contains__(q) and model.__contains__(words[-1]):
-                        #print '??'
-                        #a1 = np.array(model.vector[q])
-                        #a2 = np.array(model.vector[words[-1]])
                         score += c1.inner_product(model.vector[q],model.vector[words[-1]],model.vocab[q],param_1,param_2)
-                        #print score
+                        #score += pow(model.vocab[q],param_1) *((model.similarity(model.vector[q],model.vector[words[-1]])**param_2))
                 scores.append(score)
                 score = 0
             print 'calculation finish'
