@@ -21,7 +21,7 @@ const long long max_size = 2000;         // max length of strings
 const long long N = 100;                  // number of closest words that will be shown
 const long long max_w = 50;              // max length of vocabulary entries
 
-int checkword(char* W,char* word)
+/*int checkword(char* W,char* word)
 {
     int i = 0;
     for(i = 0; i < 24415; i++)
@@ -29,7 +29,7 @@ int checkword(char* W,char* word)
         if(!strcmp(W[i],word)) return 1;
     }
     return 0;
-}
+}*/
 int main(int argc, char **argv) {
   FILE *f;
   char st1[max_size];
@@ -45,8 +45,8 @@ int main(int argc, char **argv) {
   float *M_syn1;
   char syn1_name[max_size],word_file[max_size];
   long long syn_words, syn_size;
-  if (argc < 4) {
-    printf("Usage: ./distance <FILE_syn0> <FILE_syn1> <WORD_FILE>\nwhere FILE contains word projections in the BINARY FORMAT\n");
+  if (argc < 3) {
+    printf("Usage: ./distance <FILE_syn0> <FILE_syn1> \nwhere FILE contains word projections in the BINARY FORMAT\n");
     return 0;
   }
   strcpy(file_name, argv[1]);
@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
     len = sqrt(len);
     for (a = 0; a < size; a++) M[a + b * size] /= len;
   }
-  //syn1 vector load
+  //syn1neg vector load
   for (b = 0; b < syn_words; b++) {
     a = 0;
     for (a = 0; a < size; a++) fread(&M_syn1[a + b * size], sizeof(float), 1, f_syn);
@@ -188,8 +188,8 @@ int main(int argc, char **argv) {
       for (b = 0; b < cn; b++) if (bi[b] == c) a = 1;
       if (a == 1) continue;
       dist = 0;
-      if(checkword(W,vocab[c]) == 1)  
-         break;
+      //if(checkword(W,vocab[c]) == 1)  
+        // break;
       for (a = 0; a < size; a++) dist += vec[a] * M_syn1[a + c * size];
       for (a = 0; a < N; a++) {
         if (dist > bestd[a]) {
