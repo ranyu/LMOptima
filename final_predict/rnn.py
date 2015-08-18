@@ -71,13 +71,14 @@ def build_model():
     return model
 
 def iter_batch(train_x,train_labels,BATCH_SIZE):
-    num = np.random.randint(0,len(train_x)-BATCH_SIZE)
+    num = np.random.randint(0,len(train_x)-BATCH_SIZE*150)
     print num
     batch_X = np.zeros((BATCH_SIZE,150,256))
     batch_Y = np.zeros((BATCH_SIZE,150,6))
+    base = num
     for i in xrange(BATCH_SIZE):
-	batch_X[i] = train_x[i*num:i*num+150,:]
-	batch_Y[i] = train_labels[i*num:i*num+150,:]
+	batch_X[i] = train_x[base+150*i:base+150*(i+1),:]
+	batch_Y[i] = train_labels[base+150*i:base+150*(i+1),:]
     #print batch_X,batch_Y
     #print batch_X.shape,batch_Y.shape
     return batch_X,batch_Y
@@ -103,8 +104,8 @@ def main():
 	for j in xrange(EPOCH):
 	    batch_x,batch_y = iter_batch(train_x,train_labels,BATCH_SIZE)
     	    model.train_on_batch(batch_x,batch_y,accuracy=True)
-	    '''if j % 2 == 0:
-    	    	print score(model,valibatch_x,valibatch_y,BATCH_SIZE)'''
+	    if j % 2 == 0:
+    	    	print score(model,valibatch_x,valibatch_y,BATCH_SIZE)
 
 if __name__ == "__main__":
     main()
